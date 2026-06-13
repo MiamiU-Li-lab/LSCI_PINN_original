@@ -1,0 +1,24 @@
+name: pinn_lsci
+
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.9
+  - numpy>=1.24
+  - scipy>=1.10
+  - matplotlib>=3.7
+  - h5py>=3.8
+  - pip
+
+  # PyTorch with CUDA 11.8 — change pytorch-cuda version to match your driver
+  - pytorch>=2.0.0
+  - torchvision>=0.15.0
+  - pytorch-cuda=11.8   # replace with 12.1 or 12.4 for newer drivers
+                        # remove this line entirely for CPU-only install
+
+  - pip:
+    - scipy>=1.10       # fallback if conda version is outdated
