@@ -1,6 +1,10 @@
 # Python
 __pycache__/
 
+# Results
+results/
+results_*/
+
 # Virtual environments
 .env
 .venv

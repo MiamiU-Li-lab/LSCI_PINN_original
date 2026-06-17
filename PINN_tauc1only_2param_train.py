@@ -161,4 +161,4 @@ for idx in range(num_images):
 print(f"Test Time: {time.time() - start_time:.2f} sec")
 print(f"Saved {num_images} prediction result images")
 
-torch.save(model.state_dict(), 'PINN_state_dict_fastdynamics_BL14.pth')
+torch.save(model.state_dict(), 'PINN_state_dict_fastdynamics.pth')

@@ -33,12 +33,12 @@ class InverseModel(nn.Module):
 # --- Physical Model ---
 def physical_model(x, T):
     rho1 = x[:, 0:1]
-    tauc2 = x[:, 1:2]
+    tauc1 = x[:, 1:2]
     beta0 = torch.tensor(0.72)
-    x1 = T / tauc2
+    eps = 1e-10
+    x1 = T / (tauc1 + eps)
     sqrt_x1 = torch.sqrt(x1)
     x1_sq = x1 ** 2
-    eps = 1e-10
 
     A = torch.exp(-2 * sqrt_x1) * (4 * x1 + 6 * sqrt_x1 + 3) - 3 + 2 * x1
     term1 = (rho1 ** 2) * A / (2 * x1_sq + eps)
@@ -59,10 +59,10 @@ def compute_r2_map(Y_true, Y_pred, H, W):
     return r2.reshape(H, W)
 
 # --------- Main Script ---------
-test_data_dir = '08_22_BL18'
+test_data_dir = '../BL13'
 mat_files = sorted([
     f for f in glob.glob(os.path.join(test_data_dir, 'LSCI_*_WFfast_*.mat'))
-    if f.count("_") == 7   # exactly 3 underscores total
+    if f.count("_") == 3   # exactly 3 underscores total; 3 for BL13 and 7 for BL18
 ])
 # Load T from the first file
 with h5py.File(mat_files[0], 'r') as f:
@@ -72,13 +72,13 @@ T = torch.tensor(T, dtype=torch.float32).unsqueeze(0).squeeze(-1)
 # Load model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = InverseModel().to(device)
-model.load_state_dict(torch.load('PINN_state_dict_fastdynamics_BL14.pth', map_location=device))
+model.load_state_dict(torch.load('PINN_state_dict_fastdynamics.pth', map_location=device))
 model.eval()
 
 # Create output directory
 output_dir = 'results_fast_dynamics_BL14_model'
 os.makedirs(output_dir, exist_ok=True)
-start_time = time.time()
+
 for file in mat_files:
     fname = os.path.splitext(os.path.basename(file))[0]
     print(f'Processing {fname}...')
@@ -89,12 +89,15 @@ for file in mat_files:
     data = np.expand_dims(data, axis=0)  # [1, H, W, C]
     H, W = data.shape[1], data.shape[2]
     Y_input = data.reshape(-1, data.shape[-1])
+    start_time = time.time()
     Y_tensor = torch.tensor(Y_input, dtype=torch.float32).to(device)
 
     # Inference
     with torch.no_grad():
         pred_params = model(Y_tensor)  # [N, 2]
         pred_params = pred_params.cpu()
+        time_spent = time.time() - start_time
+        print(f'Total inference time: {time_spent:.2f} sec')
         pred_rho0 = pred_params[:, 0].reshape(H, W).numpy()
         pred_tauc1 = pred_params[:, 1].reshape(H, W).numpy()
 
@@ -124,6 +127,5 @@ for file in mat_files:
     plt.savefig(output_dir + f'/{fname}_allmaps.png', dpi=300)
     plt.close()
 
-time_spent = time.time() - start_time
-print(f'Total inference time: {time_spent:.2f} sec')
+
 print('All done.')

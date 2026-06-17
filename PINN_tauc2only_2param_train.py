@@ -29,39 +29,8 @@ def physics_loss(y_hat, y_true, T):
     y_pred = physical_model(x_combined, T)
     return nn.functional.mse_loss(y_pred, y_true)
 
-# --- Load fitted rho0 and tauc2 from rs_fast.mat ---
-def load_fitted_params(data_dir, ny=1080, nx=1440):
-    mat_files = sorted(glob.glob(os.path.join(data_dir, '*Fittingresults*WFslow*.mat')))
-    all_rho0 = []
-    all_tauc2 = []
-
-    for mat_path in mat_files:
-        data = loadmat(mat_path, struct_as_record=False, squeeze_me=True)
-        rs_fast = data['rs_slow']
-        Rs_varFit = np.zeros((ny * nx, 3))  # beta0, rho0, tauc2, R²
-
-        for i in range(ny * nx):
-            entry = rs_fast[i]
-            Rs_varFit[i, 0:3] = entry.varFit
-        # Reshape to [ny, nx, 4] to match image format
-        Rs = Rs_varFit.reshape(ny, nx, 3)
-
-        rho0_map = Rs[:, :, 1].reshape(-1)
-        tauc2_map = Rs[:, :, 2].reshape(-1)
-
-        all_rho0.append(rho0_map)
-        all_tauc2.append(tauc2_map)
-
-    # Stack into [N_total_pixels, 2]
-    rho0_all = np.concatenate(all_rho0)
-    tauc2_all = np.concatenate(all_tauc2)
-    fitted = np.stack([rho0_all, tauc2_all], axis=1)
-
-    return torch.tensor(fitted, dtype=torch.float32)
-
-
 # --- Load Data ---
-train_data_dir = '/projectnb/npbvan/ns/LSCI_WF_Data/BL14'
+train_data_dir = 'BL14'
 mat_files = sorted(glob.glob(os.path.join(train_data_dir, 'LSCI*slow*.mat')))
 
 X_list = []
@@ -116,30 +85,16 @@ optimizer = torch.optim.Rprop(model.parameters(), lr=1e-2)
 
 train_losses, test_losses = [], []
 epochs = 200
-lambda_pinn = 1e5
 
 for epoch in range(epochs):
     start_time = time.time()
     model.train()
     total_train_loss = 0.0
-    for Y_batch, _, fitted_batch in train_loader:
-        Y_batch, fitted_batch = Y_batch.to(device), fitted_batch.to(device)
+    for Y_batch, _ in train_loader:
+        Y_batch = Y_batch.to(device)
         y_hat = model(Y_batch)
         T_batch = T.squeeze(-1).expand(Y_batch.size(0), -1).to(device)
-        loss_phys = physics_loss(y_hat, Y_batch, T_batch)
-        # loss_prior = nn.functional.mse_loss(y_hat, fitted_batch)
-        # Scale rho0 and tauc2 to match Kssd scale to avoid loss dominated by one variable
-        y_hat_scaled = y_hat.clone()
-        y_hat_scaled[:, 1] = y_hat_scaled[:, 1] / 1e5
-        y_hat_scaled[:, 0] = y_hat_scaled[:, 0] / 10
-
-        fitted_scaled = fitted_batch.clone()
-        fitted_scaled[:, 1] = fitted_scaled[:, 1] / 1e5
-        fitted_scaled[:, 0] = fitted_scaled[:, 0] / 10
-
-        loss_prior = nn.functional.mse_loss(y_hat_scaled, fitted_scaled)
-
-        loss = lambda_pinn * loss_phys + lambda_prior * loss_prior
+        loss = physics_loss(y_hat, Y_batch, T_batch)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -153,12 +108,11 @@ for epoch in range(epochs):
             Y_batch = Y_batch.to(device)
             y_hat = model(Y_batch)
             T_batch = T.squeeze(-1).expand(Y_batch.size(0), -1).to(device)
-            loss = lambda_pinn * physics_loss(y_hat, Y_batch, T_batch)
+            loss = physics_loss(y_hat, Y_batch, T_batch)
             total_test_loss += loss.item()
     test_losses.append(total_test_loss / len(test_loader))
     time_spent = time.time() - start_time
-    print(time_spent)
-    print(f"Epoch {epoch+1} | Train Loss: {train_losses[-1]:.6f} | Test Loss: {test_losses[-1]:.6f}")
+    print(f"Epoch {epoch+1} | Train Loss: {train_losses[-1]:.6f} | Test Loss: {test_losses[-1]:.6f} | Time: {time_spent:.2f}s")
 
 # %% validation and visualization
 start_time = time.time()
@@ -167,7 +121,7 @@ outputs = []
 num_images = 2
 # Inference
 with torch.no_grad():
-    for Y_batch, _, _ in test_loader:
+    for Y_batch, _ in test_loader:
         Y_batch = Y_batch.to(device)
         y_hat = model(Y_batch)
         outputs.append(y_hat.cpu())
@@ -208,4 +162,4 @@ for idx in range(num_images):
 test_duration = time.time() - start_time
 print(f"Test Time: {test_duration:.2f} sec")
 print(f"Saved {num_images} prediction result images")
-torch.save(model.state_dict(), 'PINN_B14_model_rprop_200epoch.pth')
+torch.save(model.state_dict(), 'PINN_state_dict_slowdynamics.pth')
