@@ -217,4 +217,4 @@ year = {2026}
 ## Contact
 
 **MiamiU Li Lab** 
-GitHub: [https://github.com/MU-Li-lab](https://github.com/MiamiU-Li-lab)
+GitHub: [https://github.com/MiamiU-Li-lab](https://github.com/MiamiU-Li-lab)
