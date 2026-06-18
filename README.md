@@ -41,9 +41,9 @@ $$B = e^{-\sqrt{x_1}}\left(2x_1 + 6\sqrt{x_1} + 6\right) - 6 + x_1$$
 
 ### Slow-Dynamics Model 
 
-$$K(T) = \sqrt{\beta_0} \cdot \sqrt{\rho_0^2 \frac{e^{-2x}-1+2x}{2x^2} + 4\rho_0(1-\rho_0)\frac{e^{-x}-1+x}{x^2} + (1-\rho_0)^2}$$
+$$K(T) = \sqrt{\beta_0} \cdot \sqrt{\rho_0^2 \frac{e^{-2x_2}-1+2x_2}{2x_2^2} + 4\rho_0(1-\rho_0)\frac{e^{-x_2}-1+x_2}{x_2^2} + (1-\rho_0)^2}$$
 
-where $x = T/\tau_{c2}$. Estimated parameters: **{ρ<sub>0</sub>, τ<sub>c2</sub>}**, with β<sub>0</sub> derived from data as K(T<sub>0</sub>)<sup>2</sup>.
+where $x_2 = T/\tau_{c2}$. Estimated parameters: **{ρ<sub>0</sub>, τ<sub>c2</sub>}**, with β<sub>0</sub> derived from data as K(T<sub>0</sub>)<sup>2</sup>.
 
 ---
 

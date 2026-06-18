@@ -13,6 +13,7 @@ import h5py
 import matplotlib.pyplot as plt
 import glob 
 import os
+import time
 # --- Physical Model ---
 def physical_model(x, T):
     rho1 = x[:, 0:1]
