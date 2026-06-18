@@ -57,6 +57,8 @@ LSCI_PINN_original/
 ├── PINN_tauc2only_2param_test.py    # Slow-dynamics PINN — evaluation
 ├── environment.yml                  # Conda environment (pinn_lsci)
 ├── data/
+│   ├── BL14/                        # Training data (mouse #14, baseline session)
+│   └── BL13/                        # Evaluation data (mouse #13)
 ├── LICENSE
 └── README.md
 ```
@@ -90,13 +92,13 @@ multi-exposure, LSCI speckle contrast maps are stored as **MATLAB v7.3 (HDF5) `.
 ### Expected directory layout
 
 ```
-<parent_dir>/
-├── BL13/                            # Evaluation data (mouse #13)
-│   ├── LSCI_*_WFfast_*.mat
-│   └── LSCI*slow*.mat
-└── LSCI_PINN_original/              # This repository
-    └── BL14/                        # Training data (mouse #14, baseline session)
-        ├── LSCI*fast*.mat
+LSCI_PINN_original/
+└── data/
+    ├── BL14/                        # Training data (mouse #14, baseline session)
+    │   ├── LSCI*fast*.mat
+    │   └── LSCI*slow*.mat
+    └── BL13/                        # Evaluation data (mouse #13)
+        ├── LSCI_*_WFfast_*.mat
         └── LSCI*slow*.mat
 ```
 
@@ -117,7 +119,7 @@ Each `.mat` file contains:
 python PINN_tauc1only_2param_train.py
 ```
 
-- Reads `BL14/LSCI*fast*.mat`  
+- Reads `data/BL14/LSCI*fast*.mat`  
 - 20 exposure timepoints (full T range)  
 - Outputs: `PINN_state_dict_fastdynamics.pth`
 
@@ -127,7 +129,7 @@ python PINN_tauc1only_2param_train.py
 python PINN_tauc2only_2param_train.py
 ```
 
-- Reads `BL14/LSCI*slow*.mat`  
+- Reads `data/BL14/LSCI*slow*.mat`  
 - 28 exposure timepoints (first 7 dropped: T < ~1000 ms)  
 - Outputs: `PINN_state_dict_slowdynamics.pth`
 
@@ -142,7 +144,7 @@ python PINN_tauc1only_2param_test.py
 ```
 
 - Loads `PINN_state_dict_fastdynamics.pth`  
-- Tests on `../BL13/LSCI*fast*.mat`  
+- Tests on `data/BL13/LSCI*fast*.mat`  
 - Saves to `results_fast_dynamics_BL14_model/`
 
 ### Slow-Dynamics Model
@@ -152,7 +154,7 @@ python PINN_tauc2only_2param_test.py
 ```
 
 - Loads `PINN_state_dict_slowdynamics.pth`  
-- Tests on `../BL13/LSCI*slow*.mat`  
+- Tests on `data/BL13/LSCI*slow*.mat`  
 - Saves to `results_slow_dynamics_BL14_model/`
 
 ---

@@ -30,7 +30,7 @@ def physics_loss(y_hat, y_true, T):
     return nn.functional.mse_loss(y_pred, y_true)
 
 # --- Load Data ---
-train_data_dir = 'BL14'
+train_data_dir = 'data/BL14'
 mat_files = sorted(glob.glob(os.path.join(train_data_dir, 'LSCI*slow*.mat')))
 
 X_list = []

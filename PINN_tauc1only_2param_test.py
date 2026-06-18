@@ -59,7 +59,7 @@ def compute_r2_map(Y_true, Y_pred, H, W):
     return r2.reshape(H, W)
 
 # --------- Main Script ---------
-test_data_dir = '../BL13'
+test_data_dir = 'data/BL13'
 mat_files = sorted([
     f for f in glob.glob(os.path.join(test_data_dir, 'LSCI_*_WFfast_*.mat'))
     if f.count("_") == 3   # exactly 3 underscores total; 3 for BL13 and 7 for BL18

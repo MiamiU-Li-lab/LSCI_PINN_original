@@ -55,7 +55,7 @@ def compute_r2_map(Y_true, Y_pred, H, W):
     return r2.reshape(H, W)
 
 # --------- Main Script ---------
-test_dir  = '../BL13'
+test_dir  = 'data/BL13'
 mat_files = sorted(glob.glob(os.path.join(test_dir, 'LSCI*slow*.mat')))
 output_dir   = 'results_slow_dynamics_BL14_model'
 os.makedirs(output_dir, exist_ok=True)
