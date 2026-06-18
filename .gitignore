@@ -10,3 +10,6 @@ results_*/
 .venv
 env/
 venv/
+
+# VS Code
+.vscode/

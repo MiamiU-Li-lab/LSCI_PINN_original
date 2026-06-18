@@ -55,9 +55,8 @@ LSCI_PINN_original/
 ├── PINN_tauc1only_2param_test.py    # Fast-dynamics PINN — evaluation
 ├── PINN_tauc2only_2param_train.py   # Slow-dynamics PINN — training
 ├── PINN_tauc2only_2param_test.py    # Slow-dynamics PINN — evaluation
-├── environment.yml                  # Conda environment (n2n-pinn)
+├── environment.yml                  # Conda environment (pinn_lsci)
 ├── data/
-│   └── README.md                    # Data format and directory layout
 ├── LICENSE
 └── README.md
 ```
@@ -91,13 +90,14 @@ multi-exposure, LSCI speckle contrast maps are stored as **MATLAB v7.3 (HDF5) `.
 ### Expected directory layout
 
 ```
-<project_root>/
-├── BL14/                            # Training data  (mouse #14, baseline session)
-│   ├── LSCI_2024722_WFfast_*.mat
-│   └── LSCI_2024722_WFslow_*.mat
-└── 08_22_BL18/                      # Evaluation data (mouse #18, post-stroke time course)
-    ├── LSCI_2024822_WFfast_*.mat
-    └── LSCI_2024822_WFslow_*.mat
+<parent_dir>/
+├── BL13/                            # Evaluation data (mouse #13)
+│   ├── LSCI_*_WFfast_*.mat
+│   └── LSCI*slow*.mat
+└── LSCI_PINN_original/              # This repository
+    └── BL14/                        # Training data (mouse #14, baseline session)
+        ├── LSCI*fast*.mat
+        └── LSCI*slow*.mat
 ```
 
 Each `.mat` file contains:
@@ -119,7 +119,7 @@ python PINN_tauc1only_2param_train.py
 
 - Reads `BL14/LSCI*fast*.mat`  
 - 20 exposure timepoints (full T range)  
-- Outputs: `PINN_state_dict_fastdynamics_BL14.pth`
+- Outputs: `PINN_state_dict_fastdynamics.pth`
 
 ### Slow-Dynamics Model
 
@@ -129,7 +129,7 @@ python PINN_tauc2only_2param_train.py
 
 - Reads `BL14/LSCI*slow*.mat`  
 - 28 exposure timepoints (first 7 dropped: T < ~1000 ms)  
-- Outputs: `PINN_B14_model_rprop_200epoch.pth`
+- Outputs: `PINN_state_dict_slowdynamics.pth`
 
 ---
 
@@ -141,8 +141,8 @@ python PINN_tauc2only_2param_train.py
 python PINN_tauc1only_2param_test.py
 ```
 
-- Loads `PINN_state_dict_fastdynamics_BL14.pth`  
-- Tests on `08_22_BL18/LSCI*fast*.mat`  
+- Loads `PINN_state_dict_fastdynamics.pth`  
+- Tests on `../BL13/LSCI*fast*.mat`  
 - Saves to `results_fast_dynamics_BL14_model/`
 
 ### Slow-Dynamics Model
@@ -151,9 +151,9 @@ python PINN_tauc1only_2param_test.py
 python PINN_tauc2only_2param_test.py
 ```
 
-- Loads `PINN_B14_model_rprop_200epoch.pth`  
-- Tests on `08_22_BL18/LSCI*slow*.mat`  
-- Saves to `PINN_B14_model_rprop_200epoch/`
+- Loads `PINN_state_dict_slowdynamics.pth`  
+- Tests on `../BL13/LSCI*slow*.mat`  
+- Saves to `results_slow_dynamics_BL14_model/`
 
 ---
 
@@ -164,7 +164,6 @@ Each evaluation run produces the following per input file:
 | File | Contents |
 |---|---|
 | `*_allmaps.png` | 4-panel image: predicted ρ map, predicted τ<sub>c</sub> map, true β<sub>0</sub> map, R² map |
-| `*_measured_vs_fitted.png` | 20-panel figure: measured K(T) (dots) vs. PINN-reconstructed curve (line) for a spatial grid of pixels |
 
 ---
 
