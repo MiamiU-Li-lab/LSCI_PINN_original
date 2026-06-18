@@ -5,7 +5,7 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-%3E%3D2.0-orange?logo=pytorch)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> **Source repository:** https://github.com/MU-Li-lab/LSCI_PINN_original
+> **Source repository:** https://github.com/MiamiU-Li-lab/LSCI_PINN_original
 
 ---
 
