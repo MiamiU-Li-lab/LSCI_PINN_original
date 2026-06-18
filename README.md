@@ -1,6 +1,6 @@
 # LSCI-PINN: Physics-Informed Neural Network for Laser Speckle Contrast Imaging
 
-[![GitHub](https://img.shields.io/badge/GitHub-MU--Li--lab%2FLSCI__PINN__original-blue?logo=github)](https://github.com/MU-Li-lab/LSCI_PINN_original)
+[![GitHub](https://img.shields.io/badge/GitHub-MiamiU--Li--lab%2FLSCI__PINN__original-blue?logo=github)](https://github.com/MiamiU-Li-lab/LSCI_PINN_original)
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-%3E%3D2.0-orange?logo=pytorch)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
