@@ -16,10 +16,11 @@ def physical_model(x, T):
     rho0 = x[:, 0:1]
     tauc2 = x[:, 1:2]
     beta0 = x[:, 2:3]
-    x2 = T / (tauc2 + 1e-10)
-    eps = 1e-10
-    term1 = (rho0 ** 2) * (torch.exp(-2 * x2) - 1 + 2 * x2) / (2 * x2 ** 2 + eps)
-    term2 = 4 * rho0 * (1 - rho0) * (torch.exp(-x2) - 1 + x2) / (x2 ** 2 + eps)
+    eps = 1e-12
+
+    x2 = T / (tauc2 + eps)
+    term1 = (rho0 ** 2) * (torch.exp(-2 * x2) - 1 + 2 * x2) / (2 * x2 ** 2)
+    term2 = 4 * rho0 * (1 - rho0) * (torch.exp(-x2) - 1 + x2) / (x2 ** 2)
     term3 = (1 - rho0) ** 2
     return beta0.sqrt() * (term1 + term2 + term3).sqrt()
 

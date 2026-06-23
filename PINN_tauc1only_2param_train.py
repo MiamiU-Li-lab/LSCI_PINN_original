@@ -19,16 +19,16 @@ def physical_model(x, T):
     rho1 = x[:, 0:1]
     tauc2 = x[:, 1:2]
     beta0 = torch.tensor(0.72)
-    x1 = T / tauc2
+    eps = 1e-12
+    x1 = T / (tauc2 + eps)
     sqrt_x1 = torch.sqrt(x1)
     x1_sq = x1 ** 2
-    eps = 1e-10
 
     A = torch.exp(-2 * sqrt_x1) * (4 * x1 + 6 * sqrt_x1 + 3) - 3 + 2 * x1
-    term1 = (rho1 ** 2) * A / (2 * x1_sq + eps)
+    term1 = (rho1 ** 2) * A / (2 * x1_sq)
 
     B = torch.exp(-sqrt_x1) * (2 * x1 + 6 * sqrt_x1 + 6) - 6 + x1
-    term2 = 8 * rho1 * (1 - rho1) * B / (x1_sq + eps)
+    term2 = 8 * rho1 * (1 - rho1) * B / (x1_sq)
 
     term3 = (1 - rho1) ** 2
 
