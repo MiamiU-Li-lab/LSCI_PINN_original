@@ -19,6 +19,9 @@ GPU_fitting/compare_GPU_vs_MATLABfit.m
 GPU_fitting/SCC_LSCIFitting_GPU.m
 GPU_fitting/SCC_LSCIFitting_GPU_fast.m
 
-# Comparison / analysis scripts
+# analysis scripts
 compare_PINN_vs_fitting.py
+plot_boxplot_from_csv.py
 results_comparison/
+*.csv
+

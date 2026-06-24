@@ -45,7 +45,6 @@ def physical_model(x, T):
 
     B = torch.exp(-sqrt_x1) * (2 * x1 + 6 * sqrt_x1 + 6) - 6 + x1
     term2 = 8 * rho1 * (1 - rho1) * B / (x1_sq)
-
     term3 = (1 - rho1) ** 2
 
     result = torch.sqrt(beta0) * torch.sqrt(term1 + term2 + term3)

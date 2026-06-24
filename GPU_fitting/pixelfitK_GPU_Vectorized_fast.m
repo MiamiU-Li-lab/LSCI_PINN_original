@@ -115,35 +115,39 @@ function x = reflect_bounds(x, lb, ub)
 end
 
 
-%% --- FIXED ANALYTICAL JACOBIAN CORE HELPER ---
+%% --- FAST ANALYTICAL JACOBIAN CORE HELPER ---
 
 function [K, J_rho, J_tauC] = evaluate_fast_jacobian(T, beta, rho, tauC, type)
-    % FIX: Separated the array formatting configuration to pass independent arguments.
-    % This permits MATLAB to parse [] accurately for automatic size mapping.
     rho_3D  = reshape(rho, 1, 1, []);
     tau_3D  = reshape(tauC, 1, 1, []);
     beta_3D = reshape(beta, 1, 1, []);
     
-    x = T ./ tau_3D; 
-    exp_neg_x  = exp(-x);
-    exp_neg_2x = exp(-2.*x);
+    x = T ./ tau_3D;
+    sqrt_x = sqrt(x);
+    exp_neg_sqrt_x  = exp(-sqrt_x);
+    exp_neg_2sqrt_x = exp(-2 .* sqrt_x);
     
-    % Model Subfunctions
-    f1 = (exp_neg_2x - 1 + 2.*x) ./ (2 .* x.^2);
-    f2 = (exp_neg_x - 1 + x) ./ (x.^2);
+    % Model subfunctions matching pixelfitK_singleTauFit_fast.m
+    f1 = (exp_neg_2sqrt_x .* (4 .* x + 6 .* sqrt_x + 3) - 3 + 2 .* x) ./ (2 .* x.^2);
+    f2 = (exp_neg_sqrt_x  .* (2 .* x + 6 .* sqrt_x + 6) - 6 + x) ./ (x.^2);
     
-    % Derivatives of Subfunctions with respect to internal ratio x
-    df1_dx = (-2.*exp_neg_2x + 2) ./ (2 .* x.^2) - 2.*(exp_neg_2x - 1 + 2.*x) ./ (2 .* x.^3);
-    df2_dx = (-exp_neg_x + 1) ./ (x.^2) - 2.*(exp_neg_x - 1 + x) ./ (x.^3);
+    % Derivatives of subfunctions with respect to internal ratio x
+    dN1_dx = 2 - 2 .* exp_neg_2sqrt_x .* (1 + 2 .* sqrt_x);
+    df1_dx = (dN1_dx ./ (2 .* x.^2)) - ...
+             ((exp_neg_2sqrt_x .* (4 .* x + 6 .* sqrt_x + 3) - 3 + 2 .* x) ./ (x.^3));
+
+    dN2_dx = 1 - exp_neg_sqrt_x .* (1 + sqrt_x);
+    df2_dx = (dN2_dx ./ (x.^2)) - ...
+             (2 .* (exp_neg_sqrt_x .* (2 .* x + 6 .* sqrt_x + 6) - 6 + x) ./ (x.^3));
     
     % Compute variance based on target spatial or temporal formulation
     if strcmp(type, 't')
-        V = (rho_3D.^2 .* f1) + (4 .* rho_3D .* (1 - rho_3D) .* f2);
-        dV_drho = (2 .* rho_3D .* f1) + (4 .* (1 - 2.*rho_3D) .* f2);
+        V = (rho_3D.^2 .* f1) + (8 .* rho_3D .* (1 - rho_3D) .* f2);
+        dV_drho = (2 .* rho_3D .* f1) + (8 .* (1 - 2.*rho_3D) .* f2);
     else
         f3 = (1 - rho_3D).^2;
-        V = (rho_3D.^2 .* f1) + (4 .* rho_3D .* (1 - rho_3D) .* f2) + f3;
-        dV_drho = (2 .* rho_3D .* f1) + (4 .* (1 - 2.*rho_3D) .* f2) - 2.*(1 - rho_3D);
+        V = (rho_3D.^2 .* f1) + (8 .* rho_3D .* (1 - rho_3D) .* f2) + f3;
+        dV_drho = (2 .* rho_3D .* f1) + (8 .* (1 - 2.*rho_3D) .* f2) - 2.*(1 - rho_3D);
     end
     
     % Outer function evaluate
@@ -151,11 +155,11 @@ function [K, J_rho, J_tauC] = evaluate_fast_jacobian(T, beta, rho, tauC, type)
     
     % Safeguard zero points to completely protect against division by zero errors
     K_safeguard = max(K, 1e-8);
-    dK_dV = 0.5 .* sqrt(beta_3D) ./ K_safeguard;
+    dK_dV = 0.5 .* beta_3D ./ K_safeguard;
     
     % Final analytical Jacobians via exact chain rule expansions
     J_rho  = dK_dV .* dV_drho;
-    dV_dx  = (rho_3D.^2 .* df1_dx) + (4 .* rho_3D .* (1 - rho_3D) .* df2_dx);
+    dV_dx  = (rho_3D.^2 .* df1_dx) + (8 .* rho_3D .* (1 - rho_3D) .* df2_dx);
     dx_dtauC = -T ./ (tau_3D.^2);
     J_tauC = dK_dV .* dV_dx .* dx_dtauC;
 end
