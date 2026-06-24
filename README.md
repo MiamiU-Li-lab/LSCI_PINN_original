@@ -24,6 +24,8 @@ The forward physics models are embedded in the loss function, enabling unsupervi
 
 ---
 
+Conventional nonlinear fitting baselines are also provided in `CPU_fitting/` and `GPU_fitting/` for comparison with the PINN reconstructions.
+
 ## Physics Background
 
 ### Fast-Dynamics Model 
@@ -55,10 +57,13 @@ LSCI_PINN_original/
 ├── PINN_tauc1only_2param_test.py    # Fast-dynamics PINN — evaluation
 ├── PINN_tauc2only_2param_train.py   # Slow-dynamics PINN — training
 ├── PINN_tauc2only_2param_test.py    # Slow-dynamics PINN — evaluation
+├── CPU_fitting/                     # MATLAB CPU nonlinear fitting baselines
+├── GPU_fitting/                     # MATLAB GPU-vectorized fitting baselines
 ├── environment.yml                  # Conda environment (pinn_lsci)
 ├── data/
 │   ├── BL14/                        # Training data (mouse #14, baseline session)
-│   └── BL13/                        # Evaluation data (mouse #13)
+│   ├── BL13/                        # Evaluation data (mouse #13)
+│   └── 08_22_BL18/                  # Additional evaluation data
 ├── LICENSE
 └── README.md
 ```
@@ -97,7 +102,10 @@ LSCI_PINN_original/
     ├── BL14/                        # Training data (mouse #14, baseline session)
     │   ├── LSCI*fast*.mat
     │   └── LSCI*slow*.mat
-    └── BL13/                        # Evaluation data (mouse #13)
+    ├── BL13/                        # Evaluation data (mouse #13)
+    │   ├── LSCI_*_WFfast_*.mat
+    │   └── LSCI*slow*.mat
+    └── 08_22_BL18/                  # Additional evaluation data
         ├── LSCI_*_WFfast_*.mat
         └── LSCI*slow*.mat
 ```
