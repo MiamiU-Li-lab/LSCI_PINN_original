@@ -216,7 +216,7 @@ If you use this code or data in your research, please cite our work. BibTeX will
 journal = {bioRxiv},
 publisher = {Cold Spring Harbor Laboratory},
 title = {{Physics-Informed Neural Network for Mapping Vascular and Tissue Dynamics Using Laser Speckle Contrast Imaging}},
-url = {https://www.biorxiv.org/content/early/2026/02/02/2026.02.01.702939},
+url = {https://www.biorxiv.org/content/10.64898/2026.02.01.702939v1},
 year = {2026}
 }
 
